@@ -11,7 +11,7 @@ AnsiConsole.WriteLine("Manage your OTP tokens in the terminal!");
 
 var table = new Table().LeftAligned();
 
-table.AddColumns("Name", "Code", "Time remaining");
+table.AddColumns("[bold]Name[/]", "[bold]Code[/]", "[bold]Time remaining[/]");
 
 await AnsiConsole.Live(table)
     .StartAsync(async ctx =>
