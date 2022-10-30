@@ -9,4 +9,3 @@ public sealed class OtpEntry
     [JsonPropertyName("secret")]
     public string Secret { get; set; }
 }
-

@@ -11,16 +11,22 @@ public static class LiveData
         Table table,
         LiveDisplayContext ctx,
         OtpEntry entry,
-        int position)
+        int tablePosition)
     {
         var totp = new Totp(Encoding.ASCII.GetBytes(entry.Secret));
-        table.AddRow(entry.Name, totp.ComputeTotp(), $"{totp.RemainingSeconds()}s");
-        while (totp.RemainingSeconds() > 0)
+        var computedTotp = totp.ComputeTotp();
+        var remainingSeconds = totp.RemainingSeconds();
+        
+        table.AddRow(entry.Name, computedTotp, $"{totp.RemainingSeconds()}s");
+
+        while (remainingSeconds > 0)
         {
-            table.UpdateCell(position, 1, totp.ComputeTotp());
-            table.UpdateCell(position, 2, $"{totp.RemainingSeconds()}s");
+            table.UpdateCell(tablePosition, 1, computedTotp);
+            table.UpdateCell(tablePosition, 2, $"{remainingSeconds}s");
             ctx.Refresh();
             await Task.Delay(1000 - DateTime.UtcNow.Millisecond);
+            remainingSeconds = totp.RemainingSeconds();
+            computedTotp = totp.ComputeTotp();
         }
     }
 }
