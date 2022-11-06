@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using CliOtp.Data;
 using OtpNet;
 using Spectre.Console;
 
@@ -7,16 +6,12 @@ namespace CliOtp.Core;
 
 public static class LiveData
 {
-    public static async Task OtpRoutine(
-        Table table,
-        LiveDisplayContext ctx,
-        OtpEntry entry,
-        int tablePosition)
+    public static async Task OtpRoutine(this Table table, OtpEntry entry, int tablePosition, LiveDisplayContext ctx)
     {
         var totp = new Totp(Encoding.ASCII.GetBytes(entry.Secret));
         var computedTotp = totp.ComputeTotp();
         var remainingSeconds = totp.RemainingSeconds();
-        
+
         table.AddRow(entry.Name, computedTotp, $"{totp.RemainingSeconds()}s");
 
         while (remainingSeconds > 0)

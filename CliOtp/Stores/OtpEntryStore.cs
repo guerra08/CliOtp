@@ -1,25 +1,17 @@
 ﻿using CliOtp.Config;
-using CliOtp.Data;
+using CliOtp.Core;
 
 namespace CliOtp.Stores;
 
 public static class OtpEntryStore
 {
-
-    private static readonly IList<OtpEntry> OtpEntries;
-
-    static OtpEntryStore()
-    {
-        OtpEntries = ConfigReader
-            .ReadConfig<ConfigData>(ConfigFiles.ConfigFilePath())
+    private static readonly IEnumerable<OtpEntry> Entries =
+        ConfigReader
+            .ReadConfig<Configuration>(ConfigFiles.ConfigFilePath())
             .OtpEntries;
-    }
-    
+
     public static IEnumerable<OtpEntry> GetEntries()
     {
-        return OtpEntries;
+        return Entries;
     }
-
-    public static bool IsEmpty() => OtpEntries.Count == 0;
-
 }

@@ -1,29 +1,36 @@
 ﻿using CliOtp.Core;
+using CliOtp.Exceptions;
 using CliOtp.Stores;
 using Spectre.Console;
 
 AnsiConsole.Write(
     new FigletText("CliOtp")
-    .LeftAligned()
-    .Color(Color.Orange1));
+        .LeftAligned()
+        .Color(Color.Orange1));
 
 AnsiConsole.WriteLine("Manage your OTP tokens in the terminal!");
 
-var table = new Table().LeftAligned();
+try
+{
+    var table = new Table().LeftAligned();
 
-table.AddColumns("[bold]Name[/]", "[bold]Code[/]", "[bold]Time remaining[/]");
+    var configurationEntries = OtpEntryStore.GetEntries();
 
-await AnsiConsole.Live(table)
-    .StartAsync(async ctx =>
-    {
-        var tasks = OtpEntryStore.GetEntries()
-            .Select(async (entry, index) =>
+    table.AddColumns("[bold]Name[/]", "[bold]Code[/]", "[bold]Time remaining[/]");
+
+    await AnsiConsole.Live(table)
+        .StartAsync(async ctx =>
+        {
+            var tasks = configurationEntries.Select(async (entry, index) =>
             {
-                await LiveData.OtpRoutine(table, ctx, entry, index);
-            })
-            .ToArray();
-
-        await Task.WhenAll(tasks);
-    });
-
-return 0;
+                await table.OtpRoutine(entry, index, ctx);
+            }).ToArray();
+            await Task.WhenAll(tasks);
+        });
+    return 0;
+}
+catch (ConfigurationException e)
+{
+    AnsiConsole.Write(e.Message);
+    return 1;
+}
